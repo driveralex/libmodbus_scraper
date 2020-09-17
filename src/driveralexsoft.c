@@ -86,58 +86,73 @@ int main(void)
         printf("%s\n", sqlite3_column_text(res, 0));
     }
 
+    /* Creation table primaire */ 
+
     char *sql = "CREATE TABLE TimeRef(Idscrap INT, TableTimestamp TEXT);";
-                "INSERT INTO TimeRef VALUES(0,'1523115');";
-               
+ //               "INSERT INTO TimeRef VALUES(0,'1523115');";
+
+
+    printf("Creation table primaire:\n<%s>\n",sql);
+
+    /* Insertion table primaire */
     char *timerefinsert = "INSERT INTO TimeRef VALUES(1,'";
     char *endins = "');";
-    char *concat1 = (char * ) malloc(1+ strlen(timerefinsert)+strlen(outputtime));
-    
-    /*strcpy(concat1,timerefinsert);
-    strcat(concat1,outputtime);
-    printf("\nString 1:\n%s\n",concat1);*/
-    
-    
-    concat1 = stringcreate(timerefinsert,outputtime);
-
-    
-    //char *concat2 = (char * ) malloc(1+ strlen(concat1)+strlen(endins));
-    char *concat2 ;
-    concat2 = stringcreate(stringcreate(timerefinsert,outputtime),endins);
-
-    printf("\nString 2:\n%s\n",concat2);
-
-    /*
-    printf("Before");
-    printf("%s",concat2);
-    printf("After");
-    */
-
-    /*Faire une fonction d'ajout des 2 parm vers un tableau ( la requette sql )*/
-
+    char *concat1 = (char * ) malloc(1+ strlen(timerefinsert)+strlen(outputtime)+strlen(endins));
+    concat1 = stringcreate(stringcreate(timerefinsert,outputtime),endins);
+    printf("Insertion table primaire:\n<%s>\n",concat1);
 
     /* Creation de la table frogien */ 
     char *newrowscraptable = "CREATE TABLE tab_";
-    char *rawtabletimereftemp = (char * ) malloc(1+ strlen(newrowscraptable)+strlen(outputtime));
-    strcpy(rawtabletimereftemp,newrowscraptable);
-    strcat(rawtabletimereftemp,outputtime);
+    char *inside1 = "(Modbusaddr INT, allValue INT);";
+    char *concat2 = (char * ) malloc(1+ strlen(newrowscraptable)+strlen(outputtime)+strlen(inside1));
+    concat2 = stringcreate(stringcreate(newrowscraptable,outputtime),inside1);
+    printf("\nCreation de la table frogien:\n<%s>\n",concat2);
 
-    char *inside1 = "(Modbusaddr INT, Value INT);";
-    char *rawcreatfinal = (char * ) malloc(1+ strlen(rawtabletimereftemp)+strlen(inside1));
-    strcpy(rawcreatfinal,rawtabletimereftemp);
+
+    /* Insertion dans table frogien */
+    int addr = 18;
+    int val = 4587;
+
+    char *firstinsforgien = "INSERT INTO tab_";
+    char *azerty = " VALUES(";
+    char *virg = ",";
+    char *end = ");";
+    char addrstring[1024]; 
+    char valstring[1024];
+    sprintf(addrstring,"%d",addr);
+    sprintf(valstring,"%d",val);
+
+    char *concat3 = (char * ) malloc(1+ strlen(firstinsforgien)+strlen(outputtime)+strlen(azerty));
+    concat3 = stringcreate(stringcreate(firstinsforgien,outputtime),azerty);
+
+    char *concattmp = (char * ) malloc(1+strlen(concat3)+strlen(addrstring));
+    concattmp = stringcreate(concat3,addrstring);
+    
+    char *concattmpbis = (char * ) malloc(1+strlen(concat3)+strlen(virg));
+    concattmpbis = stringcreate(concattmp,virg);
+    
+    char *addencore = (char *) malloc(1+strlen(concattmpbis)+strlen(valstring)+strlen(end));
+    addencore = stringcreate(stringcreate(concattmpbis,valstring),end);
+
+    printf("\nCreation de la table frogien debug:\n<%s>\n",addencore);
+    
+
+    
+   /* char *rawcreatfinal = (char * ) malloc(1+ strlen(tmp2)+strlen(inside1));
+    strcpy(rawcreatfinal,tmp2);
     strcat(rawcreatfinal,inside1);
     /*printf("Before");
     printf("%s",rawcreatfinal);
     printf("After");*/
 
-
+/*
     char *insertforgeintable = "INSERT INTO tab_";
     char *insertforgeintablertmp = (char * ) malloc(1+ strlen(insertforgeintable)+strlen(inside1));
     strcpy(insertforgeintablertmp,insertforgeintable);
     strcat(insertforgeintablertmp,outputtime);
 
-    
-
+   */ 
+/*
     printf("Before");
     printf("%s",insertforgeintablertmp);
     printf("After");
@@ -147,8 +162,10 @@ int main(void)
 
 
 
+*/
 
-    rcd = sqlite3_exec(db, rawcreatfinal, 0, 0, &err_msg);
+
+    rcd = sqlite3_exec(db, sql, 0, 0, &err_msg);
     if (rcd != SQLITE_OK )
     {
         fprintf(stderr, "SQL error: %s\n", err_msg);
