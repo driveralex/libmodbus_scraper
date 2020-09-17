@@ -1,7 +1,5 @@
-FROM debian:10 AS builder
+FROM debian:10
 
-RUN useradd -ms /bin/bash driveralex
-USER root
 WORKDIR /libmodbus_project
 
 RUN apt-get update && \
@@ -19,18 +17,10 @@ COPY ./src/* ./libmodbus-3.1.6/tests/
 EXPOSE 502:502
 
 RUN gcc ./libmodbus-3.1.6/tests/driveralexsoft.c -lsqlite3 -Wall -o driveralexsoft $(pkg-config --libs --cflags libmodbus)
+#RUN cd ./libmodbus-3.1.6/tests/ &&\
+#    ls
 
-FROM debian:10
-USER root
-
-#RUN apk update && apk add useradd sqlite3 libmodbus;
-
-RUN apt-get update && \
-    apt-get -y install sqlite3 libmodbus5 && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN useradd -ms /bin/bash driveralex
-USER driveralex
-WORKDIR /home/driveralex
-COPY --from=builder /libmodbus_project/driveralexsoft .
-RUN ./driveralexsoft
+RUN cd /tmp && \
+    touch imafile && \
+    ls -a
+#CMD [ "./driveralexsoft" ]
