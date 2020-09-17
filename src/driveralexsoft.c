@@ -47,6 +47,61 @@ char * stringcreate(char *a,char *b )
     return tmp;
 }
 
+char * createtimetable(void)
+{
+    char *sql = "CREATE TABLE TimeRef(Idscrap INT, TableTimestamp TEXT);";
+    //printf("Creation table primaire:\n<%s>\n",sql);
+    return sql;
+}
+
+char * insertimetable(char * time)
+{
+    char *timerefinsert = "INSERT INTO TimeRef VALUES(1,'";
+    char *endins = "');";
+    char *concat1 = (char * ) malloc(1+ strlen(timerefinsert)+strlen(time)+strlen(endins));
+    concat1 = stringcreate(stringcreate(timerefinsert,time),endins);
+    //printf("Insertion table primaire:\n<%s>\n",concat1);
+    return concat1;
+}
+
+char * createtabledata(char * time)
+{
+    char *newrowscraptable = "CREATE TABLE tab_";
+    char *inside1 = "(Modbusaddr INT, allValue INT);";
+    char *concat2 = (char * ) malloc(1+ strlen(newrowscraptable)+strlen(time)+strlen(inside1));
+    concat2 = stringcreate(stringcreate(newrowscraptable,time),inside1);
+    printf("\nCreation de la table frogien:\n<%s>\n",concat2);
+    return concat2;
+}
+
+char * insertabledata(char * time,int addr,int dataval)
+{
+    char *firstinsforgien = "INSERT INTO tab_";
+    char *azerty = " VALUES(";
+    char *virg = ",";
+    char *end = ");";
+    char addrstring[1024]; 
+    char datavalstring[1024];
+    sprintf(addrstring,"%d",addr);
+    sprintf(datavalstring,"%d",dataval);
+
+    char *concat3 = (char * ) malloc(1+ strlen(firstinsforgien)+strlen(time)+strlen(azerty));
+    concat3 = stringcreate(stringcreate(firstinsforgien,time),azerty);
+
+    char *concattmp = (char * ) malloc(1+strlen(concat3)+strlen(addrstring));
+    concattmp = stringcreate(concat3,addrstring);
+    
+    char *concattmpbis = (char * ) malloc(1+strlen(concat3)+strlen(virg));
+    concattmpbis = stringcreate(concattmp,virg);
+    
+    char *addencore = (char *) malloc(1+strlen(concattmpbis)+strlen(datavalstring)+strlen(end));
+    addencore = stringcreate(stringcreate(concattmpbis,datavalstring),end);
+
+    printf("\nCreation de la table frogien debug:\n<%s>\n",addencore);
+    return addencore;
+}
+
+
 int main(void)
 {
     char outputtime[1024];
@@ -68,8 +123,6 @@ int main(void)
         return -1;
     }
 
-    
-
     rcd = sqlite3_prepare_v2(db, "SELECT SQLITE_VERSION()", -1, &res, 0);
 
     if(rcd != SQLITE_OK)
@@ -87,84 +140,17 @@ int main(void)
     }
 
     /* Creation table primaire */ 
-
-    char *sql = "CREATE TABLE TimeRef(Idscrap INT, TableTimestamp TEXT);";
- //               "INSERT INTO TimeRef VALUES(0,'1523115');";
-
-
-    printf("Creation table primaire:\n<%s>\n",sql);
+    char *sql = createtimetable();
+    //printf("Creation table primaire:\n<%s>\n",sql);
 
     /* Insertion table primaire */
-    char *timerefinsert = "INSERT INTO TimeRef VALUES(1,'";
-    char *endins = "');";
-    char *concat1 = (char * ) malloc(1+ strlen(timerefinsert)+strlen(outputtime)+strlen(endins));
-    concat1 = stringcreate(stringcreate(timerefinsert,outputtime),endins);
-    printf("Insertion table primaire:\n<%s>\n",concat1);
+    insertimetable(outputtime);
 
     /* Creation de la table frogien */ 
-    char *newrowscraptable = "CREATE TABLE tab_";
-    char *inside1 = "(Modbusaddr INT, allValue INT);";
-    char *concat2 = (char * ) malloc(1+ strlen(newrowscraptable)+strlen(outputtime)+strlen(inside1));
-    concat2 = stringcreate(stringcreate(newrowscraptable,outputtime),inside1);
-    printf("\nCreation de la table frogien:\n<%s>\n",concat2);
-
+    createtabledata(outputtime);
 
     /* Insertion dans table frogien */
-    int addr = 18;
-    int val = 4587;
-
-    char *firstinsforgien = "INSERT INTO tab_";
-    char *azerty = " VALUES(";
-    char *virg = ",";
-    char *end = ");";
-    char addrstring[1024]; 
-    char valstring[1024];
-    sprintf(addrstring,"%d",addr);
-    sprintf(valstring,"%d",val);
-
-    char *concat3 = (char * ) malloc(1+ strlen(firstinsforgien)+strlen(outputtime)+strlen(azerty));
-    concat3 = stringcreate(stringcreate(firstinsforgien,outputtime),azerty);
-
-    char *concattmp = (char * ) malloc(1+strlen(concat3)+strlen(addrstring));
-    concattmp = stringcreate(concat3,addrstring);
-    
-    char *concattmpbis = (char * ) malloc(1+strlen(concat3)+strlen(virg));
-    concattmpbis = stringcreate(concattmp,virg);
-    
-    char *addencore = (char *) malloc(1+strlen(concattmpbis)+strlen(valstring)+strlen(end));
-    addencore = stringcreate(stringcreate(concattmpbis,valstring),end);
-
-    printf("\nCreation de la table frogien debug:\n<%s>\n",addencore);
-    
-
-    
-   /* char *rawcreatfinal = (char * ) malloc(1+ strlen(tmp2)+strlen(inside1));
-    strcpy(rawcreatfinal,tmp2);
-    strcat(rawcreatfinal,inside1);
-    /*printf("Before");
-    printf("%s",rawcreatfinal);
-    printf("After");*/
-
-/*
-    char *insertforgeintable = "INSERT INTO tab_";
-    char *insertforgeintablertmp = (char * ) malloc(1+ strlen(insertforgeintable)+strlen(inside1));
-    strcpy(insertforgeintablertmp,insertforgeintable);
-    strcat(insertforgeintablertmp,outputtime);
-
-   */ 
-/*
-    printf("Before");
-    printf("%s",insertforgeintablertmp);
-    printf("After");
-    printf("Beforefunct");
-    printf("%s",stringcreate(insertforgeintable,outputtime));
-    printf("After");
-
-
-
-*/
-
-
+    insertabledata(outputtime,5613,4789);
     rcd = sqlite3_exec(db, sql, 0, 0, &err_msg);
     if (rcd != SQLITE_OK )
     {
